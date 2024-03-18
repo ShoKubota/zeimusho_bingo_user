@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import '@freee_jp/vibes/css';
-import { Button, Container } from '@freee_jp/vibes'
+import { Button, Container, Header, SubSectionTitle, Note, Stack } from '@freee_jp/vibes'
 
 const gridOptions: string[] = [
   "麹町税務署",
@@ -99,16 +99,20 @@ const getRandomInt = (max: number): number => {
   return Math.floor(Math.random() * Math.floor(max));
 };
 
+// [[name: string, clicked: boolean], [], [], [], []]
+
 const App: React.FC = () => {
   const [grid, setGrid] = useState<Array<Array<ICell>>>(
-    Array.from({length: 5}, () =>
-      Array.from({length: 5}, () => ({
-        name: gridOptions[getRandomInt(gridOptions.length)],
-        clicked: false
-      }))
+    Array.from({length: 5}, (v, i) =>
+      Array.from({length: 5}, (v, j) =>
+        ({
+          name: (i === 2 && j === 2) ? '' : gridOptions[getRandomInt(gridOptions.length)],
+          clicked: false
+        }))
     ));
 
   const handleClick = (i: number, j: number) => {
+    if (i === 2 && j === 2) return; // 真ん中のマスをクリックした時の反応を防ぐ
     const newGrid = [...grid];
     newGrid[i][j].clicked = !grid[i][j].clicked;
     setGrid(newGrid);
@@ -117,18 +121,58 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header>
-        <Container width='normal'>
-          <p>Edit <code>src/App.tsx</code> and save to reload.</p>
-          <Button>Button</Button>
-          <div>
-            {grid.map((row, i) =>
-              <div key={i} style={{ display: 'flex' }}>
-                {row.map((cell, j) =>
-                  <div key={j} onClick={() => handleClick(i, j)} style={{ margin: '5px', padding: '10px', border: '1px solid black', borderRadius: '50%', backgroundColor: cell.clicked ? 'red' : 'white' }}>
-                    {cell.name}
-                  </div>)}
-              </div>)}
-          </div>
+      <Header mb={2}disableGutters sectionDataList={[]} logo={<SubSectionTitle>税務署BINGO</SubSectionTitle>} />
+        <Container width='narrow' responsive={true}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+          {grid.map((row, i) =>
+            <div key={i} style={{ display: 'flex', justifyContent: 'center' }}> {/* 各行も中央に寄せます */}
+              {row.map((cell, j) =>
+                <div key={j}
+                    onClick={() => (i === 2 && j === 2) ? null : handleClick(i, j)}
+                    style={{
+                    width: '50px',
+                    height: '50px',
+                    lineHeight: '15px',
+                    textAlign: 'center',
+                    padding: '10px',
+                    border: '1px solid black',
+                    backgroundColor: 'white',
+                    wordWrap: 'break-word',
+                    overflow: 'auto',
+                    position: 'relative'   // relative positioning
+                    }}>
+                  {cell.name}
+                  {/* クリックされたときに画像を表示 */}
+                  {cell.clicked &&
+                  <img src='stamp.png'
+                      alt="Stamp"
+                      style={{
+                          width: '90%', // adjust as per your needs
+                          height: '90%', // adjust as per your needs
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)'
+                      }}
+                  />}
+                  {/* 真ん中のマスにSweee画像を表示 */}
+                  {(i === 2 && j === 2) &&
+                  <img src='Sweee.png'
+                      alt="Sweee"
+                      style={{
+                          width: '100%', // adjust as per your needs
+                          height: '100%', // adjust as per your needs
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)'
+                      }}
+                  />}
+                </div>)}
+            </div>)}
+        </div>
+        <Note mt={1}>※東京国税局管轄（東京都・神奈川県・千葉県・山梨県）の税務署を表示しています。埼玉県在住の方ごめんなさい</Note>
+        <Note >※リロードしたらリセットされます</Note>
         </Container>
       </header>
     </div>
