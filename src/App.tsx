@@ -102,14 +102,17 @@ const getRandomInt = (max: number): number => {
 // [[name: string, clicked: boolean], [], [], [], []]
 
 const App: React.FC = () => {
+  let randomGridOptions = [...gridOptions]
   const [grid, setGrid] = useState<Array<Array<ICell>>>(
     Array.from({length: 5}, (v, i) =>
-      Array.from({length: 5}, (v, j) =>
-        ({
-          name: (i === 2 && j === 2) ? '' : gridOptions[getRandomInt(gridOptions.length)],
-          clicked: false
-        }))
-    ));
+      Array.from({length: 5}, (v, j) => {
+        const randomIndex = getRandomInt(randomGridOptions.length);
+        const name = (i === 2 && j === 2) ? '' : randomGridOptions[randomIndex];
+        randomGridOptions.splice(randomIndex, 1);
+        return { name, clicked: false };
+      }
+    ))
+  );
 
   const handleClick = (i: number, j: number) => {
     if (i === 2 && j === 2) return; // 真ん中のマスをクリックした時の反応を防ぐ
